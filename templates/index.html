@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leopard Identification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-image: url("/static/Leo2.jpg");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        h1 {
+            text-align: center;
+            color: #ff1d58; /* Set the text color to be visible on the background */
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            color:  #f75990; /* Set the text color to be visible on the background */
+        }
+        #inputImage{
+            max-width: 100%;
+            max-height: 400px; /* Set a maximum height if needed */
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Leopard Identification</h1>
+    <form id="imageForm" enctype="multipart/form-data">
+        <input type="file" name="image" accept=".jpg, .jpeg, .png" onchange="previewImage(this)" required>
+        <button type="button" onclick="identifyImage()">Identify</button>
+    </form>
+    <div id="result"></div>
+    <img id="inputImage" alt="Input Image Preview">
+    <script>
+        function identifyImage() {
+            var form = document.getElementById('imageForm');
+            var resultDiv = document.getElementById('result');
+
+            var formData = new FormData(form);
+
+            fetch('/identify', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                resultDiv.innerText = data.result || data.error || 'Error identifying image.';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                resultDiv.innerText = 'Error identifying image.';
+            });
+        }
+
+        function previewImage(input) {
+            var inputImage = document.getElementById('inputImage');
+            var file = input.files[0];
+
+            if (file) {
+                var reader = new FileReader();
+
+                reader.onload = function(e) {
+                    inputImage.src = e.target.result;
+                };
+
+                reader.readAsDataURL(file);
+            } else {
+                inputImage.src = ''; // Clear the image if no file selected
+            }
+        }
+        
+    </script>
+</body>
+</html>
